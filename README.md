@@ -1,6 +1,6 @@
 # Tech-Start-up-Employee-Performance-Mapping-using-SQL
 This project aimed to analyse employee data at a tech satrt-up to support the HR department in decision-making regarding promotions, training, and bonus. 
-**Code**: [Employee Performance Mapping.sql](https://github.com/zhaoycy/Data-Analysis/blob/main/Tech_Start-up_Employee_Performance_Mapping.sql)
+**Code**: [Employee Performance Mapping.sql](https://github.com/zhaoycy/Tech-Start-up-Employee-Performance-Mapping-using-SQL/blob/main/Tech_Start-up_Employee_Performance_Mapping.sql)
 
 **Goal**:To analyse employee performance data and facilitate the employee performance mapping for a tech company, including employee ratings analysis, promotions & training recommendations, and bonus calculations.
 
