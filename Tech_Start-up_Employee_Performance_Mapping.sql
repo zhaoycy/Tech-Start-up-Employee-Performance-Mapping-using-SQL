@@ -135,37 +135,23 @@ JOIN dept d ON e.EMP_ID = d.EMP_ID
 JOIN unified_ratings u ON e.EMP_ID = u.EMP_ID;
 
 # Recommend training or promotion
-WITH Standard_Exp AS (
-    SELECT 'JUNIOR' AS ROLE, 2 AS EXP UNION
-    SELECT 'ASSOCIATE', 5 UNION
-    SELECT 'SENIOR', 10 UNION
-    SELECT 'LEAD', 12 UNION
-    SELECT 'MANAGER', 16
-),
-Rating_Perc AS (
-    SELECT 
-        d.EMP_ID,
-        d.ROLE,
-        d.DEPT,
-        u.EMP_RATING,
-        PERCENT_RANK() OVER (PARTITION BY d.DEPT ORDER BY u.EMP_RATING) AS rating_percentile
-    FROM dept d
-    JOIN unified_ratings u ON d.EMP_ID = u.EMP_ID
-)
 SELECT 
     e.EMP_ID,
     e.EXP,
     d.ROLE,
     rp.EMP_RATING,
     rp.rating_percentile,
-    CASE 
-        WHEN e.EXP < se.EXP AND rp.rating_percentile <= 0.5 THEN 'Need Training'
-        WHEN e.EXP > se.EXP AND rp.rating_percentile >= 0.5 THEN 'Promotion'
-        WHEN e.EXP > (
-            SELECT AVG(e2.EXP)
-            FROM emp e2 JOIN dept d2 ON e2.EMP_ID = d2.EMP_ID
-            WHERE d2.ROLE = d.ROLE
-        ) AND rp.rating_percentile >= 0.67 THEN 'Promotion'
+   CASE
+        WHEN ((d.ROLE = 'JUNIOR' AND Check_Role_Standard(e.EXP) IN ('SENIOR', 'LEAD', 'MANAGER')) 
+              OR (d.ROLE = 'SENIOR' AND Check_Role_Standard(e.EXP) IN ('LEAD', 'MANAGER')) 
+              OR (d.ROLE = 'LEAD' AND Check_Role_Standard(e.EXP) IN ('MANAGER'))) 
+             AND rp.rating_percentile <= 0.5 THEN 'Promotion'
+        WHEN ((d.ROLE = 'MANAGER' AND Check_Role_Standard(e.EXP) IN ('JUNIOR', 'SENIOR', 'LEAD')) 
+              OR (d.ROLE = 'SENIOR' AND Check_Role_Standard(e.EXP) IN ('JUNIOR', 'LEAD')) 
+              OR (d.ROLE = 'LEAD' AND Check_Role_Standard(e.EXP) IN ('JUNIOR'))) 
+             AND rp.rating_percentile >= 0.5 THEN 'Need Training'
+        WHEN d.ROLE = Check_Role_Standard(e.EXP) AND rp.rating_percentile <= 0.25 THEN 'Promotion'
+        WHEN d.ROLE = Check_Role_Standard(e.EXP) AND rp.rating_percentile >= 0.75 THEN 'Need Training'
         ELSE 'No Action'
     END AS Recommendation
 FROM emp e
