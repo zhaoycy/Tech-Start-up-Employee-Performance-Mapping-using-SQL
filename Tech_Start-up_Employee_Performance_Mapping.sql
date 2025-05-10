@@ -106,20 +106,7 @@ SELECT
     e.EMP_ID,
     e.EXP,
     d.ROLE,
-    Check_Role_Standard(e.EXP) AS Expected_Role
-FROM emp e
-JOIN dept d ON e.EMP_ID = d.EMP_ID;
-
-# Compare employee experience to average for their role
-SELECT 
-    e.EMP_ID,
-    e.FIRST_NAME,
-    d.ROLE,
-    e.EXP,
-    (SELECT AVG(e2.EXP)
-     FROM emp e2
-     JOIN dept d2 ON e2.EMP_ID = d2.EMP_ID
-     WHERE d2.ROLE = d.ROLE) AS avg_exp_for_role
+    Check_Role_Standard(e.EXP) AS Standard_Role
 FROM emp e
 JOIN dept d ON e.EMP_ID = d.EMP_ID;
 
